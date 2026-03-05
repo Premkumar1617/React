@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { type User } from "../types/user";
+//import { useEffect, useState } from "react";
+//import { type User } from "../types/user";
 
 
 const MaintainUser =()=>{
