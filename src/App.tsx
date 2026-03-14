@@ -1,24 +1,46 @@
-import { Routes,Route,Link } from 'react-router-dom'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
-import './App.css'
-import AddUser from './pages/adduser'
-import Landing from './pages/landing'
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import LoginPage from './pages/LoginPage';
+import Landing from './pages/landing';
+import './App.css';
 
-function App() {
-
-  return (
-    <>
-    <nav>
-    <Link to="/landing">landing</Link>
-    <Link to="/add-user">Add User</Link>
-    </nav>
-     <Routes>
-      <Route path="/landing" element={<Landing />} />
-      <Route path="/add-user" element={<AddUser />} />
-    </Routes>
-    </>
-  )
+// Protected route wrapper
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <>{children}</> : <Navigate to="/" replace />;
 }
 
-export default App
+function AppRoutes() {
+  const { isAuthenticated } = useAuth();
+
+  return (
+    <Routes>
+      {/* Root: show login if not authenticated, else redirect to landing */}
+      <Route
+        path="/"
+        element={isAuthenticated ? <Navigate to="/landing" replace /> : <LoginPage />}
+      />
+      {/* Protected landing page */}
+      <Route
+        path="/landing"
+        element={
+          <ProtectedRoute>
+            <Landing />
+          </ProtectedRoute>
+        }
+      />
+      {/* Catch-all */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
+  );
+}
+
+export default App;
